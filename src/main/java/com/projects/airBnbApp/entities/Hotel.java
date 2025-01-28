@@ -1,11 +1,13 @@
 package com.projects.airBnbApp.entities;
 
+import com.vladmihalcea.hibernate.type.array.StringArrayType;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +16,9 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "hotel")
+@TypeDefs({
+        @TypeDef(name = "string-array", typeClass = StringArrayType.class)
+})
 public class Hotel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,9 +29,11 @@ public class Hotel {
 
     private String city;
 
+    @Type(type = "string-array")
     @Column(columnDefinition = "TEXT[]")
     private String[] photos;
 
+    @Type(type = "string-array")
     @Column(columnDefinition = "TEXT[]")
     private  String[] amenities;
 
