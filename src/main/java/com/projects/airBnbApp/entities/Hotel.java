@@ -49,9 +49,11 @@ public class Hotel {
     @Column(nullable = false)
     private Boolean active;
 
-    @OneToMany(mappedBy = "hotel",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "hotel",fetch = FetchType.EAGER)
     private List<Room> rooms;
 
     @ManyToOne
     private  User owner;
+
+
 }

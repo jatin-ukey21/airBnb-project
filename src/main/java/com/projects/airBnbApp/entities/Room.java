@@ -17,7 +17,7 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "hotel_id",nullable = false) // The column in Room table holding the foreign key to Hotel
     private Hotel hotel;
 
