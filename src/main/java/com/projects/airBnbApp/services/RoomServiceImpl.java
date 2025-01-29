@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class RoomServiceImpl implements RoomService{
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
+    private final InventoryService inventoryService;
     private final HotelRepository hotelRepository;
     @Override
     public RoomDTO createNewRoom(Long hotelId, RoomDTO roomDTO) {
@@ -33,6 +35,9 @@ public class RoomServiceImpl implements RoomService{
         room = roomRepository.save(room);
 
         // TODO: create inventory as soon as room is created and hotel is active
+        if (hotel.getActive()){
+            inventoryService.initializeRoomForAYear(room);
+        }
         return modelMapper.map(room,RoomDTO.class);
     }
 
@@ -60,15 +65,20 @@ public class RoomServiceImpl implements RoomService{
         return modelMapper.map(room,RoomDTO.class);
     }
 
+    @Transactional
     @Override
     public void deleteRoomById(Long roomId) {
         log.info("Deleting a  Room  with id:"+roomId);
-        boolean exists = roomRepository.existsById(roomId);
-        if (!exists){
-            throw new ResourceNotFoundException("Room not found with id:"+roomId);
-        }
-        roomRepository.deleteById(roomId);
+//        boolean exists = roomRepository.existsById(roomId);
+//        if (!exists){
+//            throw new ResourceNotFoundException("Room not found with id:"+roomId);
+//        }
+        Room room = roomRepository
+                .findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with id:"+roomId));
         // TODO: delete all future inventory for this room
+        inventoryService.deleteFutureInventories(room);
+        roomRepository.deleteById(roomId);
 
     }
 }
